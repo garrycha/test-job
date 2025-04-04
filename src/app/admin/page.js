@@ -6,14 +6,30 @@ const components = ["Birthdate", "About Me", "Address", "Phone Number"];
 
 export default function AdminPage() {
   const [pageConfig, setPageConfig] = useState(() => {
-    // Load initial configuration from localStorage or use defaults
-    const savedConfig = localStorage.getItem("pageConfig");
-    return savedConfig
-      ? JSON.parse(savedConfig)
-      : {
+    // Check if we're in the browser environment before accessing localStorage
+    if (typeof window !== "undefined") {
+      try {
+        const savedConfig = window.localStorage.getItem("pageConfig");
+        return savedConfig
+          ? JSON.parse(savedConfig)
+          : {
+              page2: ["Birthdate"],
+              page3: ["Address"],
+            };
+      } catch (error) {
+        console.error("Error reading from localStorage", error);
+        return {
           page2: ["Birthdate"],
           page3: ["Address"],
         };
+      }
+    } else {
+      // Return default config if window is not defined (SSR or non-browser environments)
+      return {
+        page2: ["Birthdate"],
+        page3: ["Address"],
+      };
+    }
   });
 
   const handleComponentChange = (page, component) => {
